@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="josiahventure.import" type="module">
   <file>import</file>
-  <name>FIXME</name>
+  <name>Imports contacts in Civi</name>
   <description>FIXME</description>
   <license>AGPL-3.0</license>
   <maintainer>
