@@ -91,25 +91,3 @@ SQL
    };
 }
 
-/*
- $result2 = civicrm_api3('Contact', 'create', [          //zde se to vypise do databaze pomoci api3 pokazde, co najede stranka
-        'external_identifier' => $row["ext_id"],
-        'contact_type' => $row["contact_type"],
-        'contact_sub_type' => $row["contact_subtp"],
-        'display_name' => $row["rcg_name"],
-        'first_name' => $row["first_name"],
-        'last_name' => $row["last_name"],
-        'organization_name' => $row["org_name"],
-        'gender_id' => $row["gender_id"],
-        'birth_date' => $row["birth_dt"],
-        // if !empty($row["email"]) {'api.Email.create' => ['email' => $row["email"]]}
-        'api.Email.create' => ['email' => $row["email"]],
-        // if !empty($row["phone_num"]) {'api.Phone.create' => ['phone' => $row["phone"]]}
-        'api.Phone.create' => ['phone' => $row["phone"]],
-        // if !empty($row["addr_line1_desc"]) {'api.Address.create' => ['location_type_id' => 1, 'street_address' => $row["addr1"], 'city' => $row["city"], 'postal_code' => $row["zip_cd"], 'country_id' => $row["addr_cntry"], 'is_primary' => 1],}
-        'api.Address.create' => ['location_type_id' => 1, 'street_address' => $row["addr1"], 'city' => $row["city"], 'postal_code' => $row["zip_cd"], 'country_id' => $row["addr_cntry"], 'is_primary' => 1],
-        'source' => $row["src_sys_id"]
-    ]);
-    }
-
- */
