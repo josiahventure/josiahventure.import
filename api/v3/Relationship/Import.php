@@ -22,9 +22,38 @@ function _civicrm_api3_relationship_Import_spec(&$spec) {
  * @see civicrm_api3_create_error
  * @throws API_Exception
  */
+
+function lookupRelationTypeId($name){
+    $relationship_type_id = civicrm_api3('RelationshipType', 'getvalue', [
+        'return' => "id",
+        'name_a_b' => $name // "",
+    ]);
+    return $relationship_type_id;
+}
+
+/*
+function getRelTpArray()
+{
+    $rel_tp = [
+        "CHM"  => lookupRelationTypeId('member_of'),
+        "CHS"  => lookupRelationTypeId('member_of'),
+        "DNM"  => lookupRelationTypeId('denomination_is'),
+        "CHG"  => lookupRelationTypeId('organized_by'),
+        "DIR"  => lookupRelationTypeId('director_of'),
+        "MCON" => lookupRelationTypeId('contact_for'),
+        "SCON" => lookupRelationTypeId('contact_for'),
+        "DSC"  => lookupRelationTypeId('disciplee_of'),
+        "YLD"  => lookupRelationTypeId('yth_leader_at'),
+        "PTR"  => lookupRelationTypeId('partnership_with'),
+    ];
+
+    return array $rel_tp;
+} */
+
 function civicrm_api3_relationship_Import($params) {
   $sql = <<<SQL
-          select r.rel_key, r.frst_const_key, r.scnd_const_key, civi_tp, trg_id /* c1.trg_id, c2.trg_id, */
+          select r.rel_key, r.frst_gold_const_key as frst_const_key, r.scnd_gold_const_key as scnd_const_key,
+            r.rel_tp, r.civi_tp, r.trg_id /* c1.trg_id, c2.trg_id, */
           from int_rel r
            /*inner join int_const c1 on c1.const_key = r.frst_const_key
            inner join int_const c2 on c2.const_key = r.scnd_const_key*/
@@ -33,6 +62,26 @@ SQL
   ;
 
   $dao = CRM_Core_DAO::executeQuery($sql);
+
+  // $lookup = new CRM_Import_Lookup();
+  $rel_tp = [
+        "CHM"  => lookupRelationTypeId('member_of'),
+        "CHS"  => lookupRelationTypeId('member_of'),
+        "DNM"  => lookupRelationTypeId('denomination_is'),
+        "CHG"  => lookupRelationTypeId('organized_by'),
+        "DIR"  => lookupRelationTypeId('director_of'),
+        "MCON" => lookupRelationTypeId('contact_for'),
+        "SCON" => lookupRelationTypeId('contact_for'),
+        "DSC"  => lookupRelationTypeId('disciplee_of'),
+        "YLD"  => lookupRelationTypeId('yth_leader_at'),
+        "PTR"  => lookupRelationTypeId('partnership_with'),
+        "UPL"  => lookupRelationTypeId('uplink_of'),
+  ];
+  /*var_dump($rel_tp["CHM"]);
+  var_dump($rel_tp["DNM"]);
+  var_dump($rel_tp["PTR"]);
+  print_r($rel_tp["DNM"]); */
+
   while($dao->fetch()){
 
     $contactId_A = CRM_CORE_DAO::singleValueQuery('select trg_id from int_const where const_key = %1',[
@@ -43,10 +92,13 @@ SQL
       1 => [$dao->scnd_const_key,'Integer']
     ]);
 
+    // echo "$dao->rel_tp id: $rel_tp[$dao->rel_tp]"."\n";
+    // print_r($dao->rel_tp."\n");
+
     $apiParams =  [
       'contact_id_a' => $contactId_A,
       'contact_id_b' => $contactId_B,
-      'relationship_type_id' => $dao->civi_tp
+      'relationship_type_id' => $rel_tp[$dao->rel_tp] // $dao->civi_tp // $lookup->lookupRelationTypeId()
     ];
 
     // print_r($apiParams);
@@ -55,7 +107,7 @@ SQL
       $result = civicrm_api3('Relationship', 'create', [
         'contact_id_a' => $contactId_A,
         'contact_id_b' => $contactId_B,
-        'relationship_type_id' => $dao->civi_tp /*%3*/
+        'relationship_type_id' => $rel_tp[$dao->rel_tp] // $dao->civi_tp // %3
       ]);
 
       /*if($dao->trg_id){
@@ -85,4 +137,6 @@ SQL
       2 => [$dao->rel_key,'Integer']
     ]);
   }
+  echo 'END'."\n";
+  return array('SUCCESS');
 }
